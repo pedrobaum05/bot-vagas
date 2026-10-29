@@ -10,7 +10,7 @@ HEADERS = {"User-Agent": "bot-vagas-pedro"}
 def buscar_vagas():
     params = {"state": "open", "per_page": 3}
     try:
-        resposta = requests.get(URL, params=params, headers=HEADERS, timeout=0.001)
+        resposta = requests.get(URL, params=params, headers=HEADERS, timeout=10)
     except requests.exceptions.Timeout:
         print("Demorou demais. Tento de novo mais tarde")
         return [] #Retorna os dados da lista vazia, pois não achou nenhuma vaga

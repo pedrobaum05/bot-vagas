@@ -18,7 +18,10 @@ def buscar_vagas():
         print("Erro de conexão ou de requisição.")
         return []
 
-    print("Status:", resposta.status_code)
+    if resposta.status_code != 200:
+        print(f"A API respondeu com erro: {resposta.status_code}")
+        return []
+    
     return resposta.json()
 
 #Uso das funções

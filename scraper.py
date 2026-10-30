@@ -7,8 +7,8 @@ URL = "https://api.github.com/repos/backend-br/vagas/issues"
 #Verifica quem está pedindo os dados
 HEADERS = {"User-Agent": "bot-vagas-pedro"}
 
-def buscar_vagas():
-    params = {"state": "open", "per_page": 3}
+def buscar_vagas(pagina=1): #Valor padrão da busca de vagas 
+    params = {"state": "open", "per_page": 3, "page": pagina}
     try:
         resposta = requests.get(URL, params=params, headers=HEADERS, timeout=10)
     except requests.exceptions.Timeout:
@@ -25,7 +25,8 @@ def buscar_vagas():
     return resposta.json()
 
 #Uso das funções
-vagas = buscar_vagas()
-print("Quantidade de vagas:", len(vagas))
-if vagas:
-    print(vagas[0]["title"])
+vagas_pagina_1 = buscar_vagas(1)
+vagas_pagina_2 = buscar_vagas(2)
+
+print("Página 1:", vagas_pagina_1[0]["title"])
+print("Página 2:", vagas_pagina_2[0]["title"])

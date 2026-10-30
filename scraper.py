@@ -1,6 +1,7 @@
 #Vai buscar/ trazer as vagas com auxílio da API do GitHub
 
 import requests
+import time
 
 #Endereço da API que vai direto para o repositório das vagas 
 URL = "https://api.github.com/repos/backend-br/vagas/issues"
@@ -24,9 +25,20 @@ def buscar_vagas(pagina=1): #Valor padrão da busca de vagas
     
     return resposta.json()
 
-#Uso das funções
-vagas_pagina_1 = buscar_vagas(1)
-vagas_pagina_2 = buscar_vagas(2)
+def buscar_todas_as_vagas(max_paginas=3):
+    todas = [] #Vai juntar todas as vagas das paginas
 
-print("Página 1:", vagas_pagina_1[0]["title"])
-print("Página 2:", vagas_pagina_2[0]["title"])
+    for pagina in range(1, max_paginas + 1):
+        vagas_da_pagina = buscar_vagas(pagina)
+
+        if not vagas_da_pagina:
+            break
+
+        todas.extend(vagas_da_pagina) #Junta todas as vagas em uma lista extendida 
+        time.sleep(1) #Dá uma pausa 
+
+    return todas
+
+#Uso das funções
+vagas = buscar_todas_as_vagas()
+print("Total de vagas:", len(vagas))

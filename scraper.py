@@ -7,6 +7,8 @@ import time
 URL = "https://api.github.com/repos/backend-br/vagas/issues"
 #Verifica quem está pedindo os dados
 HEADERS = {"User-Agent": "bot-vagas-pedro"}
+ISSUES_FIXAS = {11027, 11028}
+
 
 def buscar_vagas(pagina=1): #Valor padrão da busca de vagas 
     params = {"state": "open", "per_page": 3, "page": pagina}
@@ -24,6 +26,15 @@ def buscar_vagas(pagina=1): #Valor padrão da busca de vagas
         return []
     
     return resposta.json()
+
+def e_vaga_valida(vaga_bruta):
+    if "pull_request" in vaga_bruta:
+        return False
+    #ISSUES vai fixar as regras
+    if vaga_bruta.get("number") in ISSUES_FIXAS:
+        return False
+    return True
+
 
 def montar_ficha(vaga_bruta):
         #Vai puxar só os dados que estão .get da API

@@ -30,6 +30,8 @@ def montar_ficha(vaga_bruta):
         return {
             "titulo": vaga_bruta.get("title",   ""),
             "link" : vaga_bruta.get("html_url", ""),
+            "fonte": "github-backend-br",
+            "id_externo": str(vaga_bruta.get("id", "")), #str serve para fazer fazer número virar texto
         }
 
 def buscar_todas_as_vagas(max_paginas=3):

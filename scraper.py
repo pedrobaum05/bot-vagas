@@ -25,6 +25,13 @@ def buscar_vagas(pagina=1): #Valor padrão da busca de vagas
     
     return resposta.json()
 
+def montar_ficha(vaga_bruta):
+        #Vai puxar só os dados que estão .get da API
+        return {
+            "titulo": vaga_bruta.get("title",   ""),
+            "link" : vaga_bruta.get("html_url", ""),
+        }
+
 def buscar_todas_as_vagas(max_paginas=3):
     todas = [] #Vai juntar todas as vagas das paginas
 
@@ -42,3 +49,6 @@ def buscar_todas_as_vagas(max_paginas=3):
 #Uso das funções
 vagas = buscar_todas_as_vagas()
 print("Total de vagas:", len(vagas))
+
+ficha = montar_ficha(vagas[0])
+print(ficha)

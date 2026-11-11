@@ -46,7 +46,7 @@ def montar_ficha(vaga_bruta):
         }
 
 def buscar_todas_as_vagas(max_paginas=3):
-    todas = [] #Vai juntar todas as vagas das paginas
+    todas = []  # Vai juntar as fichas de todas as páginas
 
     for pagina in range(1, max_paginas + 1):
         vagas_da_pagina = buscar_vagas(pagina)
@@ -54,8 +54,12 @@ def buscar_todas_as_vagas(max_paginas=3):
         if not vagas_da_pagina:
             break
 
-        todas.extend(vagas_da_pagina) #Junta todas as vagas em uma lista extendida 
-        time.sleep(1) #Dá uma pausa 
+        # Este for fica DENTRO do for das páginas (mais para a direita)
+        for vaga_bruta in vagas_da_pagina:
+            if e_vaga_valida(vaga_bruta):
+                todas.append(montar_ficha(vaga_bruta))
+
+        time.sleep(1)  # pausa a cada página, fora do for das vagas
 
     return todas
 
@@ -63,5 +67,5 @@ def buscar_todas_as_vagas(max_paginas=3):
 vagas = buscar_todas_as_vagas()
 print("Total de vagas:", len(vagas))
 
-ficha = montar_ficha(vagas[0])
-print(ficha)
+for vaga in vagas:
+    print("-", vaga["titulo"])

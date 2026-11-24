@@ -1,0 +1,88 @@
+#Vai buscar/ trazer as vagas com auxílio da API do GitHub
+
+import requests
+import time
+
+#Endereço da API que vai direto para o repositório das vagas 
+URL = "https://api.github.com/repos/backend-br/vagas/issues"
+#Verifica quem está pedindo os dados
+HEADERS = {"User-Agent": "bot-vagas-pedro"}
+ISSUES_FIXAS = {11027, 11028}
+NIVEIS = {
+    "júnior": "junior",
+    "junior": "junior",
+    "pleno":  "pleno",
+    "sênior": "senior",
+    "senior": "senior",
+    "especialista": "especialista",
+    "estágio": "estagio",
+    "estagio": "estagio",
+}
+
+def buscar_vagas(pagina=1): #Valor padrão da busca de vagas 
+    params = {"state": "open", "per_page": 3, "page": pagina}
+    try:
+        resposta = requests.get(URL, params=params, headers=HEADERS, timeout=10)
+    except requests.exceptions.Timeout:
+        print("Demorou demais. Tento de novo mais tarde")
+        return [] #Retorna os dados da lista vazia, pois não achou nenhuma vaga
+    except requests.exceptions.RequestException:
+        print("Erro de conexão ou de requisição.")
+        return []
+
+    if resposta.status_code != 200:
+        print(f"A API respondeu com erro: {resposta.status_code}")
+        return []
+    
+    return resposta.json()
+
+def e_vaga_valida(vaga_bruta):
+    if "pull_request" in vaga_bruta:
+        return False
+    #ISSUES vai fixar as regras
+    if vaga_bruta.get("number") in ISSUES_FIXAS:
+        return False
+    return True
+
+def extrair_nivel(vaga_bruta):
+    #Faz a função de procurar nas etiquetas de níveis(cargo),se possui algum nível conhecido/disponível
+    for label in vaga_bruta.get("labels", []):
+        nome = label.get("name", "").lower()
+        if nome in NIVEIS:
+            return NIVEIS[nome]
+    return "desconhecido"
+
+def montar_ficha(vaga_bruta):
+        #Vai puxar só os dados que estão .get da API
+        return {
+            "titulo": vaga_bruta.get("title",   ""),
+            "link" : vaga_bruta.get("html_url", ""),
+            "fonte": "github-backend-br",
+            "id_externo": str(vaga_bruta.get("id", "")), #str serve para fazer fazer número virar texto
+            "nivel": extrair_nivel(vaga_bruta),
+        }
+
+def buscar_todas_as_vagas(max_paginas=3):
+    todas = []  # Vai juntar as fichas de todas as páginas
+
+    for pagina in range(1, max_paginas + 1):
+        vagas_da_pagina = buscar_vagas(pagina)
+
+        if not vagas_da_pagina:
+            break
+
+        # Este for fica DENTRO do for das páginas (mais para a direita)
+        for vaga_bruta in vagas_da_pagina:
+            if e_vaga_valida(vaga_bruta):
+                todas.append(montar_ficha(vaga_bruta))
+
+        time.sleep(1)  # pausa a cada página, fora do for das vagas
+
+    return todas
+
+#Uso das funções
+vagas = buscar_todas_as_vagas()
+print("Total de vagas:", len(vagas))
+
+for vaga in vagas:
+    print("-", vaga["nivel"], "|", vaga["titulo"], "|", vaga["link"])

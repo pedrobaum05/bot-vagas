@@ -85,4 +85,4 @@ vagas = buscar_todas_as_vagas()
 print("Total de vagas:", len(vagas))
 
 for vaga in vagas:
-    print("-", vaga["nivel"], "|", vaga["titulo"])
+    print("-", vaga["nivel"], "|", vaga["titulo"], "|", vaga["link"])

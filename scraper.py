@@ -8,7 +8,16 @@ URL = "https://api.github.com/repos/backend-br/vagas/issues"
 #Verifica quem está pedindo os dados
 HEADERS = {"User-Agent": "bot-vagas-pedro"}
 ISSUES_FIXAS = {11027, 11028}
-
+NIVEIS = {
+    "júnior": "junior",
+    "junior": "junior",
+    "pleno":  "pleno",
+    "sênior": "senior",
+    "senior": "senior",
+    "especialista": "especialista",
+    "estágio": "estagio",
+    "estagio": "estagio",
+}
 
 def buscar_vagas(pagina=1): #Valor padrão da busca de vagas 
     params = {"state": "open", "per_page": 3, "page": pagina}
@@ -35,6 +44,13 @@ def e_vaga_valida(vaga_bruta):
         return False
     return True
 
+def extrair_nivel(vaga_bruta):
+    #Faz a função de procurar nas etiquetas de níveis(cargo),se possui algum nível conhecido/disponível
+    for label in vaga_bruta.get("labels", []):
+        nome = label.get("name", "").lower()
+        if nome in NIVEIS:
+            return NIVEIS[nome]
+    return "desconhecido"
 
 def montar_ficha(vaga_bruta):
         #Vai puxar só os dados que estão .get da API
@@ -43,6 +59,7 @@ def montar_ficha(vaga_bruta):
             "link" : vaga_bruta.get("html_url", ""),
             "fonte": "github-backend-br",
             "id_externo": str(vaga_bruta.get("id", "")), #str serve para fazer fazer número virar texto
+            "nivel": extrair_nivel(vaga_bruta),
         }
 
 def buscar_todas_as_vagas(max_paginas=3):
@@ -68,4 +85,4 @@ vagas = buscar_todas_as_vagas()
 print("Total de vagas:", len(vagas))
 
 for vaga in vagas:
-    print("-", vaga["titulo"])
+    print("-", vaga["nivel"], "|", vaga["titulo"])
